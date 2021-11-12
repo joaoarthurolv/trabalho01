@@ -12,7 +12,7 @@ int contadorColunas(FILE *file){
             col++;
         }
     }
-    return col; 
+    return col + 1; 
 }
 
 int contadorLinhas(FILE *file){
@@ -27,26 +27,56 @@ int contadorLinhas(FILE *file){
     return linha + 1;
 }
 
+void transformaEmMatriz(int linhas, int colunas, int m[linhas][colunas], FILE *file){
+    rewind(file);
+    char c;
+    int qtd = 0, lin = 0, col = 0;
+    char current[100];
+    memset(current, 0, 100);
+
+    while(fread (&c, sizeof(char), 1, file)) {
+        if(c == ' '){
+            m[lin][col] = atoi(current);
+            col++;
+            memset(current, 0, 100);
+        } 
+        else if(c == '\n'){
+            m[lin][col] = atoi(current);
+            lin++;
+            col = 0;
+            memset(current, 0, 100);
+        }
+        else {
+            strcat(current, &c);
+        }
+    }
+    printf("%d\n", m[0][1]);
+
+    for(int i = 0; i < linhas; i++){
+        for(int j = 0; j < colunas; j++){
+            if(j == (colunas - 1))
+                printf("%d\n", m[i][j]);
+            else
+                printf("%d ", m[i][j]);
+        }
+    }
+}
+
 int main(int argc, char *argv[]){
     FILE *file1,*file2;
     char c, num1[2], num2[2];
 
+    char* first_file_name = argv[1];
 
     file1 = fopen(argv[1], "r");
     file2 = fopen(argv[2], "r");    
     
-    int matriz1_colunas = contadorColunas(file1);
-    int matriz1_linhas = contadorLinhas(file1);
+    int m1_col = contadorColunas(file1);
+    int m1_lin = contadorLinhas(file1);
 
-    int matriz2_colunas = contadorColunas(file2);
-    int matriz2_linhas = contadorLinhas(file2);
+    int m1[m1_lin][m1_col];
 
-    int matrizA[matriz1_colunas*matriz1_linhas];
-    int matrizB[matriz2_colunas*matriz2_linhas];
-    int i=0;
-
-    printf("Matriz 1: Colunas = %d\n", matriz1_colunas);
-    printf("Matriz 1: Linhas = %d\n", matriz1_linhas);
+    transformaEmMatriz(m1_lin, m1_col, m1, file1);
 
     while(fread (&c, sizeof(char), 1, file1)) {
         if(c != ' '){                           // Verifica se o número acabou 
