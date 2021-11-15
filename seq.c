@@ -116,6 +116,7 @@ void produto(struct timeval *inicio, int m1_lin, int m1_col, int m2_lin, int m2_
 int main(int argc, char *argv[]){
     FILE *file1,*file2;
     char c, num1[2], num2[2];
+    clock_t t;
 
     char* first_file_name = argv[1];
 
@@ -143,9 +144,13 @@ int main(int argc, char *argv[]){
 
 
     if(m1_col == m2_lin){
+        t = clock();
         produto(&inicio, m1_lin, m1_col, m2_lin, m2_col, m1, m2, m3);
+        t = clock() - t;
     }else{
         printf("Erro!");
     }
-    
+
+    FILE *teste = fopen("arq3.txt", "a");
+    fprintf(teste, "%lf sec\n", ((double)t) / ((CLOCKS_PER_SEC/1000)));
 }
