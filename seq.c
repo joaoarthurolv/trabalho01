@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <sys/time.h>
+#include <time.h>
 
 int contadorColunas(FILE *file){
     char c, fim = '\n', espaco = ' ';
@@ -31,7 +32,7 @@ void transformaEmMatriz(int linhas, int colunas, int m[linhas][colunas], FILE *f
     rewind(file);
     char c;
     int qtd = 0, lin = 0, col = 0;
-    char current[100];
+    char current[100] = "";
     memset(current, 0, 100);
 
     while(fread (&c, sizeof(char), 1, file)) {
@@ -47,10 +48,9 @@ void transformaEmMatriz(int linhas, int colunas, int m[linhas][colunas], FILE *f
             memset(current, 0, 100);
         }
         else {
-            strcat(current, &c);
+            strncat(current, &c, 1);
         }
     }
-    printf("%d\n", m[0][1]);
 
     for(int i = 0; i < linhas; i++){
         for(int j = 0; j < colunas; j++){
@@ -60,6 +60,57 @@ void transformaEmMatriz(int linhas, int colunas, int m[linhas][colunas], FILE *f
                 printf("%d ", m[i][j]);
         }
     }
+}
+
+
+
+void produto(struct timeval *inicio, int m1_lin, int m1_col, int m2_lin, int m2_col, int m1[m1_lin][m1_col], int m2[m2_lin][m2_col], int m3[m1_lin][m2_col]){
+    FILE *pont;
+
+    int aux, i, j, x;
+
+
+    pont = fopen("arq3.txt", "w");
+
+    //Realiza a multiplicacao das matrizes
+
+    for(i = 0; i < m1_lin; i++) {
+        for(j = 0; j < m2_col; j++) {
+            
+            m3[i][j] = 0;
+            for(x = 0; x < m2_lin; x++) {
+                aux +=  m1[i][x] * m2[x][j];
+            }
+
+            m3[i][j] = aux;
+            aux = 0;
+        }
+    }
+    
+    struct timeval fim;
+    gettimeofday(&fim, NULL);
+
+    //Insere os valores no arquivo criado
+    fprintf(pont, "%d %d \n", m1_lin, m2_col);
+
+    for(i=0;i<m1_lin;i++){
+        for(j=0; j<m2_col;j++){
+            fprintf(pont, "C%d%d %d\n", i, j, m3[i][j]);       
+        }
+    }
+
+    // fprintf(pont, "%0.8f sec\n", &fim-&inicio);
+    fclose(pont);
+
+    printf("Resultado da multuplicacao:\n");
+
+    for(i = 0; i < m1_lin; i++) {
+        for(j = 0; j < m2_col; j++) {
+            printf("%d ", m3[i][j]);
+        }
+        printf("\n");
+    }
+    printf("\n");
 }
 
 int main(int argc, char *argv[]){
@@ -74,35 +125,27 @@ int main(int argc, char *argv[]){
     int m1_col = contadorColunas(file1);
     int m1_lin = contadorLinhas(file1);
 
+    int m2_col = contadorColunas(file2);
+    int m2_lin = contadorLinhas(file2);
+
     int m1[m1_lin][m1_col];
 
+    int m2[m2_lin][m2_col];
+
     transformaEmMatriz(m1_lin, m1_col, m1, file1);
+    printf("\n");
+    transformaEmMatriz(m2_lin, m2_col, m2, file2);
 
-    while(fread (&c, sizeof(char), 1, file1)) {
-        if(c != ' '){                           // Verifica se o número acabou 
-            size_t tamanho = strlen(num1);
-            num1[tamanho] = c;
-            num1[tamanho + 1] = '\0';
-        }else{                                  //Com o espaço identificado, o número que se encontra no vetor num1 será armazenado no vetor (matrizA)
-            matrizA[i] = 0;
-            matrizA[i] = atoi(num1);
-            i++;                                
-            memset(num1,0,strlen(num1));        //vetor num1 é zerado
-        }
+    struct timeval inicio;
+    gettimeofday(&inicio, NULL);
+
+    int m3[m1_lin][m2_col];
+
+
+    if(m1_col == m2_lin){
+        produto(&inicio, m1_lin, m1_col, m2_lin, m2_col, m1, m2, m3);
+    }else{
+        printf("Erro!");
     }
-
-    i=0;
     
-    while(fread (&c, sizeof(char), 1, file2)) {
-        if(c != ' '){
-            size_t tamanho = strlen(num2);
-            num2[tamanho] = c;
-            num2[tamanho + 1] = '\0';
-        }else{
-            matrizB[i] = 0;
-            matrizB[i] = atoi(num2);
-            i++;
-            memset(num2,0,strlen(num2));
-        }
-    }
 }

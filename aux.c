@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 int main(int argc, char *argv[]){
     int n1,n2,m1,m2,i,j;
@@ -15,6 +16,8 @@ int main(int argc, char *argv[]){
     
     int matriz1[n1][m1];
     int matriz2[n2][m2];
+
+    srand(time(NULL));
 
     for(i=0;i<n1;i++){
         for(j=0;j<m1;j++){
