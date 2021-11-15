@@ -121,7 +121,9 @@ int main(int argc, char *argv[]){
     char* first_file_name = argv[1];
 
     file1 = fopen(argv[1], "r");
-    file2 = fopen(argv[2], "r");    
+    file2 = fopen(argv[2], "r");
+
+    int p = atoi(argv[3]);    
     
     int m1_col = contadorColunas(file1);
     int m1_lin = contadorLinhas(file1);
@@ -137,20 +139,6 @@ int main(int argc, char *argv[]){
     printf("\n");
     transformaEmMatriz(m2_lin, m2_col, m2, file2);
 
-    struct timeval inicio;
-    gettimeofday(&inicio, NULL);
+    
 
-    int m3[m1_lin][m2_col];
-
-
-    if(m1_col == m2_lin){
-        t = clock();
-        produto(&inicio, m1_lin, m1_col, m2_lin, m2_col, m1, m2, m3);
-        t = clock() - t;
-    }else{
-        printf("Erro!");
-    }
-
-    FILE *teste = fopen("arq3.txt", "a");
-    fprintf(teste, "%lf sec\n", ((double)t) / ((CLOCKS_PER_SEC/1000)));
 }
